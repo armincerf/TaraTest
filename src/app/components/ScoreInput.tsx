@@ -1,26 +1,57 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useScore } from "../contexts/ScoreContext";
+import { useCompletion } from "ai/react";
 
 interface ScoreInputProps {
   testName: string;
   scoreType: "number" | "text";
   unit: string;
+  isHigherBetter: boolean; // New property to specify if higher is better
+  initialScore?: string;
+  prompt?: string;
+}
+
+interface SubmitScoreResponse {
+  success: boolean;
+  percentageChange: number | null;
+  previousScore: number | null;
+  currentScore: number;
 }
 
 export default function ScoreInput({
   testName,
   scoreType,
   unit,
+  isHigherBetter = true, // Destructure the new prop
+  initialScore = "",
+  prompt,
 }: ScoreInputProps) {
-  const [score, setScore] = useState("");
-  const [message, setMessage] = useState("");
+  const [score, setScore] = useState(initialScore);
   const [isHappy, setIsHappy] = useState(true);
   const [showAnimation, setShowAnimation] = useState(false);
+  const router = useRouter();
+  const { updateScoreStatus } = useScore();
+
+  const {
+    completion,
+    complete: generateAIResponse,
+    isLoading,
+  } = useCompletion({
+    api: "/api/completion",
+  });
+
+  useEffect(() => {
+    if (completion) {
+      setShowAnimation(true);
+    }
+  }, [completion]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,28 +61,54 @@ export default function ScoreInput({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ testName, score: Number(score) }),
+        body: JSON.stringify({
+          testName,
+          score: Number(score),
+        }),
       });
 
-      const data = await response.json();
+      const data: SubmitScoreResponse = await response.json();
+
+      // Adjust logic based on isHigherBetter
+      const isImprovement =
+        data.percentageChange !== null &&
+        ((isHigherBetter && data.percentageChange >= 0) ||
+          (!isHigherBetter && data.percentageChange <= 0));
+
+      const isWorse =
+        data.percentageChange !== null &&
+        ((isHigherBetter && data.percentageChange < 0) ||
+          (!isHigherBetter && data.percentageChange > 0));
 
       if (data.success) {
-        setMessage(data.message);
-        setIsHappy(data.scoreDifference === null || data.scoreDifference >= 0);
-        setShowAnimation(true);
-        setTimeout(() => setShowAnimation(false), 3000); // Hide animation after 3 seconds
+        const aiPrompt = `Write a sentence to be displayed to a user who just completed a ${testName} test with a result of ${data.currentScore} ${unit}.
+Make references to the average scores normal people get on these sorts of tests, but don't invent statistics and don't be too positive if it's a bad score.
+We are comparing these results to that of an experienced UI/UX designer.
+${
+  data.percentageChange !== null
+    ? `The user's score ${
+        isImprovement ? "improved" : "decreased"
+      } by ${Math.abs(data.percentageChange)}% from their previous score of ${
+        data.previousScore
+      } ${unit}.`
+    : ""
+}
+${prompt ? `The test prompt was: ${prompt}` : ""}`;
+
+        generateAIResponse(aiPrompt);
+
+        setIsHappy(isImprovement || data.percentageChange === null);
+
+        updateScoreStatus(testName, true);
+        router.refresh();
       } else {
-        setMessage("Failed to submit score. Please try again.");
-        setIsHappy(false);
         setShowAnimation(true);
-        setTimeout(() => setShowAnimation(false), 3000);
+        setIsHappy(false);
       }
     } catch (error) {
       console.error("Error submitting score:", error);
-      setMessage("An error occurred. Please try again.");
-      setIsHappy(false);
       setShowAnimation(true);
-      setTimeout(() => setShowAnimation(false), 3000);
+      setIsHappy(false);
     }
   };
 
@@ -67,7 +124,9 @@ export default function ScoreInput({
           required
         />
       </div>
-      <Button type="submit">Submit Score</Button>
+      <Button type="submit" disabled={isLoading}>
+        {isLoading ? "Generating response..." : "Submit Score"}
+      </Button>
 
       {showAnimation && (
         <motion.div
@@ -75,15 +134,14 @@ export default function ScoreInput({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           className={`mt-4 p-4 rounded-md ${
-            isHappy ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            isHappy
+              ? "bg-green-100 text-green-800"
+              : "bg-yellow-100 text-yellow-800"
           }`}
         >
-          <p>{message}</p>
-          {isHappy ? (
-            <span className="text-4xl">🎉</span>
-          ) : (
-            <span className="text-4xl">😢</span>
-          )}
+          <p>
+            {completion || "Failed to generate response. Please try again."}
+          </p>
         </motion.div>
       )}
     </form>

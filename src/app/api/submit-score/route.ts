@@ -1,93 +1,107 @@
 import { NextResponse } from "next/server";
 import Airtable from "airtable";
 
-// Check for required environment variables
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
 const AIRTABLE_BASE_ID = "appRx8nYYOYONq1GB";
 
 if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
-  throw new Error("Missing required environment variables");
+	throw new Error("Missing required environment variables");
 }
 
 const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(AIRTABLE_BASE_ID);
 
+export type SubmitScoreResponse = {
+	success: boolean;
+	percentageChange: number | null;
+	previousScore: number | null;
+	currentScore: number;
+};
+
 export async function POST(req: Request) {
-  const { testName, score } = await req.json();
+	const { testName, score } = await req.json();
 
-  const currentDate = new Date();
-  const formattedDate = currentDate.toISOString().split("T")[0];
+	const currentDate = new Date();
+	const formattedDate = currentDate.toISOString().split("T")[0];
 
-  // Calculate the date for last week
-  const lastWeekDate = new Date(currentDate);
-  lastWeekDate.setDate(lastWeekDate.getDate() - 7);
-  const formattedLastWeekDate = lastWeekDate.toISOString().split("T")[0];
+	try {
+		// Fetch all records, sorted by date in descending order
+		const allRecords = await base("TaraTest")
+			.select({
+				sort: [{ field: "Date", direction: "desc" }],
+				filterByFormula: `NOT({Date} = '')`,
+			})
+			.firstPage();
 
-  try {
-    // Fetch last week's score
-    const lastWeekRecords = await base("Table 1")
-      .select({
-        filterByFormula: `AND({Date} = '${formattedLastWeekDate}', NOT({${testName}} = ''))`,
-      })
-      .firstPage();
+		let previousScore = null;
+		let currentRecord = null;
 
-    const lastWeekScore =
-      lastWeekRecords.length > 0
-        ? Number(lastWeekRecords[0].get(testName))
-        : null;
+		// Find the current record (if it exists) and the previous score
+		for (const record of allRecords) {
+			const recordDate = record.get("Date") as string;
+			if (recordDate === formattedDate) {
+				currentRecord = record;
+				if (record.get(testName) !== undefined) {
+					previousScore = Number(record.get(testName));
+				}
+			} else if (previousScore === null && record.get(testName) !== undefined) {
+				previousScore = Number(record.get(testName));
+				break;
+			}
+		}
 
-    // Check for today's record
-    const todayRecords = await base("Table 1")
-      .select({
-        filterByFormula: `AND({Date} = '${formattedDate}', {${testName}} = '')`,
-      })
-      .firstPage();
+		// Update or create the record for today
+		if (currentRecord) {
+			await base("TaraTest").update([
+				{
+					id: currentRecord.id,
+					fields: {
+						...currentRecord.fields,
+						[testName]: score,
+					},
+				},
+			]);
+		} else {
+			await base("TaraTest").create([
+				{
+					fields: {
+						Date: formattedDate,
+						[testName]: score,
+					},
+				},
+			]);
+		}
 
-    if (todayRecords.length > 0) {
-      const record = todayRecords[0];
-      await base("Table 1").update([
-        {
-          id: record.id,
-          fields: {
-            [testName]: score,
-          },
-        },
-      ]);
-    } else {
-      await base("Table 1").create([
-        {
-          fields: {
-            Date: formattedDate,
-            [testName]: score,
-          },
-        },
-      ]);
-    }
+		let percentageChange = null;
 
-    let message = "Well done!";
-    let scoreDifference = null;
+		if (previousScore !== null) {
+			percentageChange =
+				((Number(score) - previousScore) / previousScore) * 100;
+		}
 
-    if (lastWeekScore !== null) {
-      scoreDifference = Number(score) - lastWeekScore;
-      if (scoreDifference > 0) {
-        message = `Great job! You improved by ${scoreDifference} points!`;
-      } else if (scoreDifference < 0) {
-        message = `Keep practicing! You're ${Math.abs(scoreDifference)} points behind last week.`;
-      } else {
-        message = "You matched your score from last week. Keep it up!";
-      }
-    }
+		const revalidateRes = await fetch(
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/revalidate?secret=${process.env.REVALIDATION_SECRET}&path=/`,
+			{
+				method: "POST",
+			},
+		);
 
-    return NextResponse.json({
-      success: true,
-      message,
-      scoreDifference,
-      lastWeekScore,
-    });
-  } catch (error) {
-    console.error("Error updating Airtable:", error);
-    return NextResponse.json(
-      { success: false, error: "Failed to update score" },
-      { status: 500 },
-    );
-  }
+		if (!revalidateRes.ok) {
+			console.error("Failed to revalidate");
+		}
+		console.log("submitted score: ", score)
+		const res = {
+			success: true,
+			percentageChange,
+			previousScore,
+			currentScore: Number(score),
+		} satisfies SubmitScoreResponse;
+
+		return NextResponse.json(res);
+	} catch (error) {
+		console.error("Error updating Airtable:", error);
+		return NextResponse.json(
+			{ success: false, error: "Failed to update score" },
+			{ status: 500 },
+		);
+	}
 }
