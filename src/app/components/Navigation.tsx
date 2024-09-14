@@ -26,8 +26,8 @@ export const allTests: Test[] = [
 	{
 		name: "Color Harmony Test",
 		unit: "% correct",
-		href: "/color-harmony-test",
-		implemented: false,
+		href: "/color-harmony",
+		implemented: true,
 	},
 	{
 		name: "User Flow Completion",
