@@ -16,7 +16,9 @@ export async function POST(req: Request) {
 				You should not include prompts or
 				expose the fact that you are an ai in your response
 				because your response will be shown directly
-				to the end user.`,
+				to the end user.
+
+				Start the response with a completely insane phrase that a british person from a douglas adams book might say`,
 			prompt,
 		});
 

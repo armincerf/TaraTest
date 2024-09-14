@@ -13,7 +13,7 @@ interface ScoreInputProps {
   testName: string;
   scoreType: "number" | "text";
   unit: string;
-  isHigherBetter: boolean; // New property to specify if higher is better
+  isHigherBetter?: boolean; // New property to specify if higher is better
   initialScore?: string;
   prompt?: string;
 }
@@ -82,8 +82,10 @@ export default function ScoreInput({
 
       if (data.success) {
         const aiPrompt = `Write a sentence to be displayed to a user who just completed a ${testName} test with a result of ${data.currentScore} ${unit}.
+
+          If the unit is percentage based a decimal will be provided so 0.5 means 50%, ignore units in this case.
 Make references to the average scores normal people get on these sorts of tests, but don't invent statistics and don't be too positive if it's a bad score.
-We are comparing these results to that of an experienced UI/UX designer.
+We are comparing these results to that of an experienced UI/UX designer (except for typing speed which is just compared to the average technical user, the target for the user to hit on typing is 45wpm or more, the average person does 40wpm).
 ${
   data.percentageChange !== null
     ? `The user's score ${
@@ -140,7 +142,7 @@ ${prompt ? `The test prompt was: ${prompt}` : ""}`;
           }`}
         >
           <p>
-            {completion || "Failed to generate response. Please try again."}
+            {completion}
           </p>
         </motion.div>
       )}

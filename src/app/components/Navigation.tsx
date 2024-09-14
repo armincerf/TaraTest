@@ -18,10 +18,11 @@ export const allTests: Test[] = [
 	},
 	{
 		name: "UI Element Recognition",
-		unit: "seconds",
+		unit: "% correct",
 		href: "/ui-element-recognition",
-		implemented: false,
+		implemented: true,
 	},
+
 	{
 		name: "Color Harmony Test",
 		unit: "% correct",
