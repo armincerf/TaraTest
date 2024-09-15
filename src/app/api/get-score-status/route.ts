@@ -1,22 +1,24 @@
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import Airtable from "airtable";
-
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-
-if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
-  throw new Error("Missing required environment variables");
-}
-
-const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(AIRTABLE_BASE_ID);
+import { getBase, getBaseTable } from "../utils";
 
 export async function GET() {
-  const currentDate = new Date().toISOString().split('T')[0];
+  const currentDate = new Date().toISOString().split("T")[0];
+  // Get the userId using Clerk's auth function
+  const { userId } = auth();
+
+  // Check if userId is available
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const base = getBase(userId);
+  const baseName = getBaseTable(userId);
+  console.log("base", base, userId);
 
   try {
-    const records = await base("TaraTest")
+    const records = await base(baseName)
       .select({
-        filterByFormula: `{Date} = '${currentDate}'`
+        filterByFormula: `{Date} = '${currentDate}'`,
       })
       .firstPage();
 
@@ -27,7 +29,12 @@ export async function GET() {
       const fields = todayRecord.fields as { [key: string]: unknown };
 
       for (const [key, value] of Object.entries(fields)) {
-        if (key !== 'Date' && value !== undefined && value !== null && value !== '') {
+        if (
+          key !== "Date" &&
+          value !== undefined &&
+          value !== null &&
+          value !== ""
+        ) {
           scoreStatus[key] = true;
         }
       }
@@ -38,7 +45,7 @@ export async function GET() {
     console.error("Error fetching score status:", error);
     return NextResponse.json(
       { error: "Failed to fetch score status" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

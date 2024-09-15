@@ -29,7 +29,7 @@ export default function TypingSpeedPage() {
           transition={{ delay: 0.4, duration: 0.5 }}
         >
           Ready to test your typing skills? Click the button below to start your
-          typing test on TypeRacer!
+          typing test!
         </motion.p>
         <motion.div
           whileHover={{ scale: 1.05 }}
