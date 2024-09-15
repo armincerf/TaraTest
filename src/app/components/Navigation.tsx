@@ -11,6 +11,12 @@ export const allTests: Test[] = [
 		implemented: true,
 	},
 	{
+		name: "Keyboard Shortcuts",
+		unit: "points",
+		href: "/keyboard-shortcut-test",
+		implemented: true,
+	},
+	{
 		name: "Figma Wireframe Speed",
 		unit: "seconds",
 		href: "/figma-wireframe-speed",
@@ -51,7 +57,7 @@ export const allTests: Test[] = [
 		name: "Interaction Design Speed",
 		unit: "interactions/minute",
 		href: "/interaction-design-speed",
-		implemented: false,
+		implemented: true,
 	},
 	{
 		name: "Information Architecture Sorting",

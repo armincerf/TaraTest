@@ -29,12 +29,18 @@ export default function FigmaWireframeSpeedTest() {
 		setTime(0);
 		setIsTestComplete(false);
 		await complete(`Generate a Figma wireframe prompt of similar difficulty to:
-      Create a login flow for a desktop with a resolution of 1920x1080.
-      there should be a centered component with a username and password text field, a \'reset password\' button and a \'sign in\' button.
-      under the sign in button it should say \'OR\' and then a login with google button
 
-      Use formal english and keep the prompt short. This is to be shown to a trainee designer to test their wireframing skills.
-      Do not include any text referencing these instructions.`);
+Create a login flow for a desktop with a resolution of 1920x1080.
+
+There should be a centered component with a username and password text field, a 'reset password' button and a 'sign in' button.
+
+Under the sign in button it should say 'OR' and then a login with google button.
+
+Use formal english and keep the prompt short.
+
+This is to be shown to a trainee designer to test their wireframing skills.
+
+Do not include any text referencing these instructions.`);
 	};
 
 	const endTest = () => {
@@ -50,13 +56,26 @@ export default function FigmaWireframeSpeedTest() {
 	return (
 		<div className="container mx-auto p-4">
 			<h1 className="text-2xl font-bold mb-4">Figma Wireframe Speed Test</h1>
-			{!isTestStarted && <Button onClick={startTest}>Start Test</Button>}
+			{!isTestStarted && (
+				<>
+					<p className="mb-4">
+						Click the button below to start the test. You will be given a prompt
+						to create a Figma wireframe. Once you have completed the wireframe,
+						click the "End Test" button.
+					</p>
+					<p className="mb-4">
+						You will be timed from the moment you start the test until you click
+						"End Test" so make sure figma is open and ready to go before you start.
+					</p>
+					<Button onClick={startTest}>Start Test</Button>
+				</>
+			)}
 			{isTestStarted && !isTestComplete && (
 				<div>
 					<p className="mb-4">Time: {formatTime(time)}</p>
 					<div className="bg-blue-100 p-4 rounded-md mb-4 text-black">
 						<h2 className="font-bold mb-2">Prompt:</h2>
-						<p>{completion}</p>
+						<pre className="whitespace-pre-wrap">{completion}</pre>
 					</div>
 					<Button onClick={endTest}>End Test</Button>
 				</div>

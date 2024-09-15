@@ -37,7 +37,7 @@ export default function TypingSpeedPage() {
           className="mb-8"
         >
           <Link
-            href="https://play.typeracer.com/"
+            href="https://monkeytype.com/"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300"

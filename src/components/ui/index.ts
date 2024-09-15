@@ -32,8 +32,6 @@ export {
 export { Checkbox } from "./checkbox";
 export {
 	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
 } from "./collapsible";
 export {
 	Command,
