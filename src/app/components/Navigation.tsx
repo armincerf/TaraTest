@@ -30,22 +30,22 @@ export const allTests: Test[] = [
 		implemented: true,
 	},
 	{
-		name: "User Flow Completion",
+		name: "User Flow Completion Time",
 		unit: "seconds",
 		href: "/user-flow-completion",
-		implemented: false,
+		implemented: true,
 	},
 	{
 		name: "Accessibility Checklist",
 		unit: "% correct",
 		href: "/accessibility-checklist",
-		implemented: false,
+		implemented: true,
 	},
 	{
-		name: "Heuristic Evaluation",
+		name: "Heuristic Evaluation Test",
 		unit: "% correct",
 		href: "/heuristic-evaluation",
-		implemented: false,
+		implemented: true,
 	},
 	{
 		name: "Interaction Design Speed",

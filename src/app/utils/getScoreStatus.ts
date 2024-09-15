@@ -37,6 +37,7 @@ export const getScoreStatus = cache(async (): Promise<ScoreStatus> => {
 	}
 
 	const data = await res.json();
+console.log('fetched from airtable', JSON.stringify(data, null, 2));
 	const scoreStatus: ScoreStatus = {};
 
 	// Check if a record exists for the current date

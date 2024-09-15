@@ -67,7 +67,7 @@ function hslToRgb(h: number, s: number, l: number): RGB {
 	return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
 
-function generateRandomColor(): RGB {
+export function generateRandomColor(): RGB {
 	return [randomInt(0, 255), randomInt(0, 255), randomInt(0, 255)];
 }
 
@@ -138,4 +138,9 @@ export function generateColorPalettes(count: number): { colors: string[], isHarm
     palettes.push({ colors: hexColors, isHarmonious, harmonyType });
   }
   return palettes;
+}
+
+export function generateRandomHexColor(): string {
+  const [r, g, b] = generateRandomColor();
+  return rgbToHex(r, g, b);
 }
