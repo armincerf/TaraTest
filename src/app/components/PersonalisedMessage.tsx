@@ -1,16 +1,28 @@
+"use client";
+
 import { Suspense } from "react";
-import { currentUser } from "@clerk/nextjs/server";
-import OpenAI from "openai";
 import { PersonalisedMessageClient } from "./PersonalisedMessageClient";
+import type { GetStaticProps, InferGetStaticPropsType } from "next";
 
-const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY,
-});
+export const getStaticProps: GetStaticProps<{
+	message: string;
+}> = async () => {
+	const openai = new (await import("openai")).default({
+		apiKey: process.env.OPENAI_API_KEY,
+	});
 
-async function generateDailyMessage(name: string, date: string) {
+	const currentDate = new Date().toLocaleDateString("en-US", {
+		weekday: "long",
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
+
+	let message: string;
+
 	try {
 		const response = await openai.chat.completions.create({
-			model: "gpt-4o-mini",
+			model: "gpt-4-0613",
 			messages: [
 				{
 					role: "system",
@@ -22,8 +34,8 @@ async function generateDailyMessage(name: string, date: string) {
 				},
 				{
 					role: "user",
-					content: `Generate a short, angry message for ${name}
-          that includes an interesting fact about ${date}.
+					content: `Generate a short, angry message for a user
+          that includes an interesting fact about ${currentDate}.
           Keep it under 100 characters.`,
 				},
 			],
@@ -31,28 +43,25 @@ async function generateDailyMessage(name: string, date: string) {
 			temperature: 0.7,
 		});
 
-		return (
+		message =
 			response.choices[0].message.content ||
-			`Hey ${name}, another day, another disappointment.`
-		);
+			"Hey user, another day, another disappointment.";
 	} catch (error) {
 		console.error("Error generating message:", error);
-		return `Hey ${name}, I couldn't be bothered to come up with anything special today.`;
+		message = "I couldn't be bothered to come up with anything special today.";
 	}
-}
 
-export default async function AIFooter() {
-	const user = await currentUser();
-	const firstName = user?.firstName || "nobody";
-	const currentDate = new Date().toLocaleDateString("en-US", {
-		weekday: "long",
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
+	return {
+		props: {
+			message,
+		},
+		revalidate: 86400, // Revalidate once per day
+	};
+};
 
-	const message = await generateDailyMessage(firstName, currentDate);
-
+export default function AIFooter({
+	message,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
 	return (
 		<div className="bg-white h-full p-4 bg-opacity-20">
 			<p className="bg-gray-800 text-white py-4 px-4 text-center text-sm">
