@@ -54,10 +54,12 @@ export default async function AIFooter() {
 	const message = await generateDailyMessage(firstName, currentDate);
 
 	return (
-		<p className="bg-gray-800 text-white py-4 px-4 text-center text-sm">
-			<Suspense fallback="Preparing your daily dose of rudeness...">
-				<PersonalisedMessageClient initialMessage={message} />
-			</Suspense>
-		</p>
+		<div className="bg-white h-full p-4 bg-opacity-20">
+			<p className="bg-gray-800 text-white py-4 px-4 text-center text-sm">
+				<Suspense fallback="Preparing your daily dose of rudeness...">
+					<PersonalisedMessageClient initialMessage={message} />
+				</Suspense>
+			</p>
+		</div>
 	);
 }

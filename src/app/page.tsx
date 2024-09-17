@@ -1,5 +1,7 @@
-import TaraTest from "./TaraTest";
-
 export default function Home() {
-  return <TaraTest />;
+	return (
+		<div className="bg-white flex flex-grow  bg-opacity-20 text-gray-700 text-center text-3xl font-bold justify-center items-center">
+			<h1 className="self-center">Welcome to TaraTest!</h1>
+		</div>
+	);
 }
