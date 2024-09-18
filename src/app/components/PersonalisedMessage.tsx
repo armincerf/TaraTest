@@ -1,13 +1,12 @@
-"use client";
+import { OpenAI } from "openai";
+import { revalidatePath } from "next/cache";
+import { unstable_cache as cache } from "next/cache";
 
-import { Suspense } from "react";
-import { PersonalisedMessageClient } from "./PersonalisedMessageClient";
-import type { GetStaticProps, InferGetStaticPropsType } from "next";
+// Set revalidation time to 1 hour
+export const revalidate = 3600;
 
-export const getStaticProps: GetStaticProps<{
-	message: string;
-}> = async () => {
-	const openai = new (await import("openai")).default({
+const generateMessage = cache(async () => {
+	const openai = new OpenAI({
 		apiKey: process.env.OPENAI_API_KEY,
 	});
 
@@ -18,11 +17,10 @@ export const getStaticProps: GetStaticProps<{
 		day: "numeric",
 	});
 
-	let message: string;
-
 	try {
 		const response = await openai.chat.completions.create({
-			model: "gpt-4-0613",
+			model: "gpt-4o-mini",
+			stream: false,
 			messages: [
 				{
 					role: "system",
@@ -43,32 +41,30 @@ export const getStaticProps: GetStaticProps<{
 			temperature: 0.7,
 		});
 
-		message =
+		return (
 			response.choices[0].message.content ||
-			"Hey user, another day, another disappointment.";
+			"Hey user, another day, another disappointment."
+		);
 	} catch (error) {
 		console.error("Error generating message:", error);
-		message = "I couldn't be bothered to come up with anything special today.";
+		return "I couldn't be bothered to come up with anything special today.";
 	}
+});
 
-	return {
-		props: {
-			message,
-		},
-		revalidate: 86400, // Revalidate once per day
-	};
-};
+export default async function PersonalisedMessage() {
+	const message = await generateMessage();
 
-export default function AIFooter({
-	message,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
 	return (
-		<div className="bg-white h-full p-4 bg-opacity-20">
-			<p className="bg-gray-800 text-white py-4 px-4 text-center text-sm">
-				<Suspense fallback="Preparing your daily dose of rudeness...">
-					<PersonalisedMessageClient initialMessage={message} />
-				</Suspense>
+		<div className="bg-tt-orange-2 max-w-screen-2xl mx-6">
+			<p className=" text-tt-grey p-2 text-center text-2xl">
+				{`Fact of the day: ${message}`}
 			</p>
 		</div>
 	);
+}
+
+// Server Action for on-demand revalidation
+export async function revalidatePersonalizedMessage() {
+	"use server";
+	revalidatePath("/");
 }

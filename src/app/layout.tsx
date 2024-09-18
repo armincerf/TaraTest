@@ -30,7 +30,7 @@ export default function RootLayout({
 		<ClerkProvider>
 			<html lang="en">
 				<body
-					className={`${inter.className} flex flex-col min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 text-white`}
+					className={`${inter.className} flex flex-col min-h-screen bg-tt-orange-1`}
 				>
 					<SignedOut>
 						<TaraTest />

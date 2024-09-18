@@ -3,7 +3,7 @@ import { openai } from "@ai-sdk/openai";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-	const { prompt }: { prompt: string } = await req.json();
+	const { prompt } = (await req.json()) as { prompt: string };
 
 	try {
 		const result = await streamText({
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 				because your response will be shown directly
 				to the end user.
 
-				Start the response with a completely insane phrase that a british person from a douglas adams book might say`,
+				Start the response with a completely insane phrase that a clown doctor might say`,
 			prompt,
 		});
 
