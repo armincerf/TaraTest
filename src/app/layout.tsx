@@ -14,6 +14,7 @@ import {
 } from "@clerk/nextjs";
 import PersonalizedMessage from "./components/PersonalisedMessage";
 import TaraTest from "./TaraTest";
+import Navigation from "./components/Navigation";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -30,20 +31,20 @@ export default function RootLayout({
 		<ClerkProvider>
 			<html lang="en">
 				<body
-					className={`${inter.className} flex flex-col min-h-screen bg-tt-orange-1`}
+					className={`${inter.className} bg-white`}
 				>
 					<SignedOut>
 						<TaraTest />
 					</SignedOut>
 					<SignedIn>
 						<ScoreInitializer>
-							<NavigationWrapper />
-							<main className="container mx-auto flex flex-grow overflow-auto p-4 md:p-6 w-full h-full">
+						<div className="p-2 flex flex-col gap-1 h-screen w-full">
+							<Navigation />
+							<main className="flex flex-grow bg-gray-100 overflow-auto p-4 md:p-6 w-full h-full">
 								{children}
-							</main>
-							<footer className="container mx-auto py-4 md:py-6 text-center flex-none">
-								<PersonalizedMessage />
-							</footer>
+								</main>
+						
+						</div>
 						</ScoreInitializer>
 					</SignedIn>
 				</body>
