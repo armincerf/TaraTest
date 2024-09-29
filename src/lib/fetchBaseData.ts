@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { unstable_cache } from "next/cache";
 import { z } from "zod";
 import { allTests } from "@/app/utils/getScoreStatus";
+import { cache } from "react";
 
 const BaseDataFieldsSchema = z.object({
 	"Color Harmony Test (% correct)": z.number().optional(),
@@ -110,7 +111,9 @@ export async function fetchBaseDataForDate(
 		const fetchDataFn = fetchBaseData(userId, date);
 
 		return isToday
-			? await fetchDataFn()
+			? await unstable_cache(cache(fetchDataFn), [userId, date], {
+					revalidate: 6,
+			})()
 			: await unstable_cache(fetchDataFn, [userId, date])();
 	} catch (error) {
 		console.error("Error fetching score status:", error);

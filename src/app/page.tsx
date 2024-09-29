@@ -6,33 +6,24 @@ import {
 	Carousel,
 } from "@/components/ui";
 import Trophy from "./components/icons/Trophy";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import AddFriends from "./components/icons/AddFriends";
 import Dumbell from "./components/icons/Dumbell";
 import { TodoListIcon } from "./components/icons/TodoList";
-import TodoList from "./components/TodoList";
+import { TodoList } from "./components/HomePage/TodoList";
 import {
 	CarouselContent,
 	CarouselItem,
 	CarouselNext,
 	CarouselPrevious,
 } from "@/components/ui/carousel";
-import { AverageScore } from "./components/charts/AverageScore";
+import { AverageScore } from "./components/HomePage/AverageScore";
 import { fetchBaseDataForDate } from "@/lib/fetchBaseData";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { AverageScoreWrapper, TodoListWrapper } from "./components/HomePage/AverageScoreWrapper";
 
-const yesterday = new Date();
 
-const lastSevenDays = Array.from({ length: 7 }, (_, i) => {
-	const date = new Date(yesterday);
-	date.setDate(yesterday.getDate() - i);
-	return date;
-});
-
-const datesToShow = lastSevenDays.map(
-	(date) => date.toISOString().split("T")[0],
-);
 
 interface BottomCardProps {
 	icon: ReactNode;
@@ -53,17 +44,6 @@ const BottomCard: React.FC<BottomCardProps> = ({ icon, title, label }) => (
 );
 
 export default async function Home() {
-	const userId = auth().userId;
-	const data = await Promise.all(
-		datesToShow.map((date) => fetchBaseDataForDate(userId, date)),
-	);
-	const today = new Date().toISOString().split("T")[0];
-	const todaysData = data.find((d) =>
-		d instanceof NextResponse ? false : d.Date === today,
-	);
-	if (todaysData instanceof NextResponse) {
-		return <div>Error fetching data</div>;
-	}
 
 	return (
 		<div className="bg-gray-100 flex flex-grow text-gray-900 flex-col gap-4 p-4">
@@ -73,7 +53,9 @@ export default async function Home() {
 						<CardTitle>Stats</CardTitle>
 					</CardHeader>
 					<CardContent className="h-full w-full grid">
-						<AverageScore initialData={data} />
+						<Suspense fallback={<div>Loading...</div>}>
+							<AverageScoreWrapper />
+						</Suspense>
 					</CardContent>
 				</Card>
 				<Card className="w-[335px] h-full flex flex-col gap-4 px-6 py-4">
@@ -83,7 +65,9 @@ export default async function Home() {
 						</CardTitle>
 					</CardHeader>
 					<CardContent className="flex-1 overflow-y-auto p-0">
-						<TodoList items={todaysData.items} />
+						<Suspense fallback={<TodoList items={null} />}>
+							<TodoListWrapper />
+						</Suspense>
 					</CardContent>
 				</Card>
 			</div>

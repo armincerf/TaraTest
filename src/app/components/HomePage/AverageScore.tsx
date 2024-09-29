@@ -21,8 +21,6 @@ export function AverageScore({
 		],
 	});
 
-	console.log(initialData);
-
 	useEffect(() => {
 		if (initialData && initialData.length > 0) {
 			setOptions((prevOptions) => ({
@@ -35,7 +33,9 @@ export function AverageScore({
 						date: data.Date,
 						score: data.averageScore,
 					};
-				}),
+				})
+				.filter((item): item is { date: string; score: number } => item !== null)
+				.sort((a, b) => a.date.localeCompare(b.date)),
 			}));
 		}
 	}, [initialData]);
