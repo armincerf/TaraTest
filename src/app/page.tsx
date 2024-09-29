@@ -1,12 +1,38 @@
-import { Card, CardContent, CardHeader, CardTitle, Carousel } from "@/components/ui";
+import {
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+	Carousel,
+} from "@/components/ui";
 import Trophy from "./components/icons/Trophy";
 import { ReactNode } from "react";
 import AddFriends from "./components/icons/AddFriends";
 import Dumbell from "./components/icons/Dumbell";
 import { TodoListIcon } from "./components/icons/TodoList";
 import TodoList from "./components/TodoList";
-import { CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import {
+	CarouselContent,
+	CarouselItem,
+	CarouselNext,
+	CarouselPrevious,
+} from "@/components/ui/carousel";
 import { AverageScore } from "./components/charts/AverageScore";
+import { fetchBaseDataForDate } from "@/lib/fetchBaseData";
+import { auth } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+
+const yesterday = new Date();
+
+const lastSevenDays = Array.from({ length: 7 }, (_, i) => {
+	const date = new Date(yesterday);
+	date.setDate(yesterday.getDate() - i);
+	return date;
+});
+
+const datesToShow = lastSevenDays.map(
+	(date) => date.toISOString().split("T")[0],
+);
 
 interface BottomCardProps {
 	icon: ReactNode;
@@ -26,7 +52,17 @@ const BottomCard: React.FC<BottomCardProps> = ({ icon, title, label }) => (
 	</Card>
 );
 
-export default function Home() {
+export default async function Home() {
+	const userId = auth().userId;
+	const data = await Promise.all(
+		datesToShow.map((date) => fetchBaseDataForDate(userId, date)),
+	);
+	const todaysData = data[data.length - 1];
+	// if NextResponse error, return empty array
+	if (todaysData instanceof NextResponse) {
+		return <div>Error fetching data</div>;
+	}
+
 	return (
 		<div className="bg-gray-100 flex flex-grow text-gray-900 flex-col gap-4 p-4">
 			<div className="flex flex-row gap-8 h-2/3 p-4">
@@ -35,7 +71,7 @@ export default function Home() {
 						<CardTitle>Stats</CardTitle>
 					</CardHeader>
 					<CardContent className="h-full w-full grid">
-						<AverageScore />
+						<AverageScore initialData={data} />
 					</CardContent>
 				</Card>
 				<Card className="w-[335px] h-full flex flex-col gap-4 px-6 py-4">
@@ -45,7 +81,7 @@ export default function Home() {
 						</CardTitle>
 					</CardHeader>
 					<CardContent className="flex-1 overflow-y-auto p-0">
-						<TodoList />
+						<TodoList items={todaysData.items} />
 					</CardContent>
 				</Card>
 			</div>

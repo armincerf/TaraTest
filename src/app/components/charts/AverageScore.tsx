@@ -1,28 +1,44 @@
 "use client";
-import  { useState } from "react";
+import { useEffect, useState } from "react";
 import { AgCharts } from "ag-charts-react";
-import { AgBarSeriesOptions, AgChartOptions } from "ag-charts-community";
+import type { AgChartOptions } from "ag-charts-community";
+import type { fetchBaseDataForDate } from "@/lib/fetchBaseData";
+import { NextResponse } from "next/server";
 
-export function AverageScore() {
-    const [options, setOptions] = useState<AgChartOptions>({
-        // Data: Data to be displayed in the chart
-        data: [
-            { month: "Jan", avgTemp: 2.3, iceCreamSales: 162000 },
-            { month: "Mar", avgTemp: 6.3, iceCreamSales: 302000 },
-            { month: "May", avgTemp: 16.2, iceCreamSales: 800000 },
-            { month: "Jul", avgTemp: 22.8, iceCreamSales: 1254000 },
-            { month: "Sep", avgTemp: 14.5, iceCreamSales: 950000 },
-            { month: "Nov", avgTemp: 8.9, iceCreamSales: 200000 },
-        ],
-        // Series: Defines which chart type and data to use
-        series: [
-            {
-                type: "bar",
-                xKey: "month",
-                yKey: "iceCreamSales",
-            } as AgBarSeriesOptions,
-        ],
-    });
+export function AverageScore({
+	initialData,
+}: { initialData: Awaited<ReturnType<typeof fetchBaseDataForDate>>[] | null }) {
+	const [options, setOptions] = useState<AgChartOptions>({
+		// Data: Data to be displayed in the chart
+		data: [],
+		// Series: Defines which chart type and data to use
+		series: [
+			{
+				type: "bar",
+				xKey: "date",
+				yKey: "score",
+			},
+		],
+	});
 
-    return <AgCharts options={options} />;
+	console.log(initialData);
+
+	useEffect(() => {
+		if (initialData && initialData.length > 0) {
+			setOptions((prevOptions) => ({
+				...prevOptions,
+				data: initialData.map((data) => {
+					if (data instanceof NextResponse) {
+						return null;
+					}
+					return {
+						date: data.Date,
+						score: data.averageScore,
+					};
+				}),
+			}));
+		}
+	}, [initialData]);
+
+	return <AgCharts options={options} />;
 }
