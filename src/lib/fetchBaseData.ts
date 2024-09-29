@@ -83,7 +83,7 @@ function fetchBaseData(userId: string, date: string) {
 							key.includes(test.name) && typeof value !== "undefined",
 					),
 				}))
-				.sort((a, b) => (b.completed ? 1 : 0) - (a.completed ? 1 : 0)),
+				.sort((a, b) => a.href.localeCompare(b.href)),
 			averageScore:
 				scores.reduce((sum, score) => sum + score, 0) / scores.length,
 		};

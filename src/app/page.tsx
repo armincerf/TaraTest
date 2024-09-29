@@ -57,8 +57,10 @@ export default async function Home() {
 	const data = await Promise.all(
 		datesToShow.map((date) => fetchBaseDataForDate(userId, date)),
 	);
-	const todaysData = data[data.length - 1];
-	// if NextResponse error, return empty array
+	const today = new Date().toISOString().split("T")[0];
+	const todaysData = data.find((d) =>
+		d instanceof NextResponse ? false : d.Date === today,
+	);
 	if (todaysData instanceof NextResponse) {
 		return <div>Error fetching data</div>;
 	}

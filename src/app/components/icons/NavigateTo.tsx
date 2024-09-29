@@ -7,6 +7,7 @@ export function NavigateTo() {
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 		>
+			<title>Go to test</title>
 			<rect
 				x="0.25"
 				y="0.423828"
