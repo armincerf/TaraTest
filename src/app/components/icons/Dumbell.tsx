@@ -3,8 +3,8 @@ import { SVGProps } from "react";
 export default function Dumbell(props: SVGProps<SVGSVGElement>) {
 	return (
 		<svg
-			width="46"
-			height="46"
+			width="20"
+			height="20"
 			viewBox="0 0 46 46"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"

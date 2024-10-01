@@ -38,9 +38,9 @@ export default function RootLayout({
 					</SignedOut>
 					<SignedIn>
 						<ScoreInitializer>
-						<div className="p-2 flex flex-col gap-1 h-screen w-full">
+						<div className="sm:p-2 flex flex-col gap-1 h-screen w-full">
 							<Navigation />
-							<main className="flex flex-grow bg-gray-100 overflow-auto p-4 md:p-6 w-full h-full">
+							<main className="flex flex-grow bg-gray-100 overflow-auto p-0 sm:p-4 md:p-6 w-full h-full">
 								{children}
 								</main>
 						

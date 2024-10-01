@@ -2,7 +2,7 @@ import { SVGProps } from "react";
 
 function Trophy(props: SVGProps<SVGSVGElement>) {
     return (
-        <svg width="45" height="46" viewBox="0 0 45 46" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <svg width="20" height="20" viewBox="0 0 45 46" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
             <path d="M7.7 42.9238H22.5H37.3" fill="#7B51E8" />
             <path d="M18.8 28.9777V33.4237C18.8 34.4687 17.9305 35.2857 17.0055 35.7227C14.8225 36.7487 13.25 39.5797 13.25 42.9237" fill="#7B51E8" />
             <path d="M26.2 28.9777V33.4237C26.2 34.4687 27.0695 35.2857 27.9945 35.7227C30.1775 36.7487 31.75 39.5797 31.75 42.9237" fill="#7B51E8" />

@@ -24,6 +24,13 @@ import { NextResponse } from "next/server";
 import { AverageScoreWrapper, TodoListWrapper } from "./components/HomePage/AverageScoreWrapper";
 
 
+function CardButton({ children }: { children: ReactNode }) {
+	return (
+		<button className="w-1/2 sm:w-auto flex-shrink-0 flex flex-row justify-center items-center px-4 py-2 gap-2 bg-purple-300 border-b border-purple-500 shadow-[0_4px_4px_rgba(0,0,0,0.25)_inset_1px_2px_4px_#DACEF7] rounded-md hover:bg-purple-400">
+			{children}
+		</button>
+	);
+}
 
 interface BottomCardProps {
 	icon: ReactNode;
@@ -32,13 +39,13 @@ interface BottomCardProps {
 }
 
 const BottomCard: React.FC<BottomCardProps> = ({ icon, title, label }) => (
-	<Card className="w-full flex flex-col justify-center items-center gap-3">
-		<CardHeader className="flex justify-center items-center">
-			<CardTitle className="font-normal">{title}</CardTitle>
-			<CardTitle className="flex flex-row gap-2 items-center font-normal">
+	<Card className="w-full p-4 sm:p-6">
+		<CardHeader className="p-0 flex flex-row items-center justify-between gap-4 sm:flex-wrap">
+			<h2 className="font-normal w-[45%] sm:w-auto sm:flex-1 min-w-[150px] break-words">{title}</h2>
+			<CardButton>
 				{icon}
-				{label}
-			</CardTitle>
+				<span className="whitespace-nowrap">{label}</span>
+			</CardButton>
 		</CardHeader>
 	</Card>
 );
@@ -46,8 +53,8 @@ const BottomCard: React.FC<BottomCardProps> = ({ icon, title, label }) => (
 export default async function Home() {
 
 	return (
-		<div className="bg-gray-100 flex flex-grow text-gray-900 flex-col gap-4 p-4">
-			<div className="flex flex-row gap-8 h-2/3 p-4">
+		<div className="w-full bg-gray-100 flex sm:flex-grow text-gray-900 flex-col sm:gap-4 sm:p-4">
+			<div className="flex flex-col sm:flex-row gap-8 p-2 sm:p-4">
 				<Card className="w-full flex flex-col">
 					<CardHeader>
 						<CardTitle>Stats</CardTitle>
@@ -58,7 +65,7 @@ export default async function Home() {
 						</Suspense>
 					</CardContent>
 				</Card>
-				<Card className="w-[335px] h-full flex flex-col gap-4 px-6 py-4">
+				<Card className="max-w-full sm:w-full sm:min-w-[300px] sm:max-w-[400px] h-full flex flex-col gap-4 px-6 py-4">
 					<CardHeader className="flex items-center p-0">
 						<CardTitle className="flex items-center gap-4">
 							To Do <TodoListIcon />
@@ -71,7 +78,7 @@ export default async function Home() {
 					</CardContent>
 				</Card>
 			</div>
-			<div className="flex flex-row gap-8 h-1/3 p-4">
+			<div className="flex flex-col sm:flex-row gap-4 sm:gap-8 p-4">
 				<BottomCard
 					icon={<Trophy />}
 					title="Continue your streak"
