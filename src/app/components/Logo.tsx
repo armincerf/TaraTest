@@ -4,12 +4,14 @@ function Logo() {
 	return (
 		<Link href="/">
 			<svg
+				className="scale-90 sm:scale-100"
 				width="245"
 				height="49"
 				viewBox="0 0 245 49"
 				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
 			>
+				<title>UI/UXpert</title>
 				<mask
 					id="path-1-outside-1_3_403"
 					maskUnits="userSpaceOnUse"

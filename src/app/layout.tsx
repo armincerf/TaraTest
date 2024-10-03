@@ -30,21 +30,18 @@ export default function RootLayout({
 	return (
 		<ClerkProvider>
 			<html lang="en">
-				<body
-					className={`${inter.className} bg-white`}
-				>
+				<body className={`${inter.className} bg-white`}>
 					<SignedOut>
 						<TaraTest />
 					</SignedOut>
 					<SignedIn>
 						<ScoreInitializer>
-						<div className="sm:p-2 flex flex-col gap-1 h-screen w-full">
-							<Navigation />
-							<main className="flex flex-grow bg-gray-100 overflow-auto p-0 sm:p-4 md:p-6 w-full h-full">
-								{children}
+							<div className="sm:p-2 flex flex-col gap-1 h-screen w-full">
+								<Navigation />
+								<main className="flex flex-grow bg-gray-100 overflow-auto p-0 sm:p-4 md:p-6 w-full h-full">
+									{children}
 								</main>
-						
-						</div>
+							</div>
 						</ScoreInitializer>
 					</SignedIn>
 				</body>

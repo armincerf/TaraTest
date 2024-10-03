@@ -5,26 +5,26 @@ import {
 	CardTitle,
 	Carousel,
 } from "@/components/ui";
-import Trophy from "./components/icons/Trophy";
-import { ReactNode, Suspense } from "react";
-import AddFriends from "./components/icons/AddFriends";
-import Dumbell from "./components/icons/Dumbell";
-import { TodoListIcon } from "./components/icons/TodoList";
-import { TodoList } from "./components/HomePage/TodoList";
+import Trophy from "../components/icons/Trophy";
+import { type ReactNode, Suspense } from "react";
+import AddFriends from "../components/icons/AddFriends";
+import Dumbell from "../components/icons/Dumbell";
+import { TodoListIcon } from "../components/icons/TodoList";
+import { TodoList } from "../components/HomePage/TodoList";
 import {
 	CarouselContent,
 	CarouselItem,
 	CarouselNext,
 	CarouselPrevious,
 } from "@/components/ui/carousel";
-import { AverageScore } from "./components/HomePage/AverageScore";
+import { AverageScore } from "../components/HomePage/AverageScore";
 import { fetchBaseDataForDate } from "@/lib/fetchBaseData";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import {
 	AverageScoreWrapper,
 	TodoListWrapper,
-} from "./components/HomePage/AverageScoreWrapper";
+} from "../components/HomePage/AverageScoreWrapper";
 
 function CardButton({ children }: { children: ReactNode }) {
 	return (
@@ -50,7 +50,7 @@ const BottomCard: React.FC<BottomCardProps> = ({ icon, title, label }) => (
 		</CardHeader>
 		<CardButton>
 			{icon}
-			<span className="whitespace-nowrap text-sm sm:text-base">{label}</span>
+			<span className="whitespace-nowrap text-sm sm:text-lg">{label}</span>
 		</CardButton>
 	</Card>
 );
@@ -63,13 +63,13 @@ function Section({ children }: { children: ReactNode }) {
 	);
 }
 
-export default async function Home() {
+export default async function Challenges() {
 	return (
 		<div className="w-full bg-gray-100 flex sm:flex-grow text-gray-900 flex-col sm:gap-4 sm:p-4">
 			<Section>
 				<Card className="w-full flex flex-col">
 					<CardHeader>
-						<CardTitle>Stats</CardTitle>
+						<CardTitle>Challenges</CardTitle>
 					</CardHeader>
 					<CardContent className="h-full w-full grid">
 						<Suspense fallback={<div>Loading...</div>}>

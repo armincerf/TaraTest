@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import {
 	Sheet,
 	SheetContent,
+	SheetDescription,
+	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
 import { useState } from "react";
@@ -35,12 +37,22 @@ export default function Navigation() {
 					<UserButton />
 					<Sheet open={open} onOpenChange={setOpen}>
 						<SheetTrigger asChild>
-							<Button variant="ghost" size="icon" className="md:hidden text-black z-20">
+							<Button
+								variant="ghost"
+								size="icon"
+								className="md:hidden text-black z-20"
+							>
 								<Menu className="h-5 w-5" />
 							</Button>
 						</SheetTrigger>
-						<SheetContent side="right" className="bg-white z-50">
-							<div onClick={handleLinkClick} className="mt-6 w-28">
+						<SheetTitle>Menu</SheetTitle>
+						<SheetDescription>Nav menu</SheetDescription>
+						<SheetContent
+							onClick={handleLinkClick}
+							side="right"
+							className="bg-white z-50"
+						>
+							<div className="mt-6 w-32">
 								<NavItems />
 							</div>
 						</SheetContent>

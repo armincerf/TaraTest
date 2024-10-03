@@ -1,6 +1,10 @@
-export function NavigateTo() {
+export function NavigateTo({
+	className,
+	stroke = "white",
+}: { className?: string; stroke: string }) {
 	return (
 		<svg
+			className={className ?? ""}
 			width="21"
 			height="21"
 			viewBox="0 0 21 21"
@@ -18,7 +22,7 @@ export function NavigateTo() {
 			/>
 			<path
 				d="M8.25 13.4238L12.25 10.4238L8.25 7.42383"
-				stroke="white"
+				stroke={stroke}
 				strokeWidth="2"
 				strokeLinecap="round"
 				strokeLinejoin="round"
